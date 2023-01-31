@@ -15,19 +15,46 @@ public class CustomerService {
     @Inject
     private CustomerRepository customerRepository;
 
-    public List<CustomerDTO> findAllCustomer(){
+    // Metodo para Listar os clientes (Customers)
+    public List<CustomerDTO> findAllCustomers(){
 
         List<CustomerDTO> customers = new ArrayList<>();
 
         customerRepository.findAll().stream().forEach(item -> {
-                customers.add(mapCustomerEntityDTO(item));
+                customers.add(mapCustomerEntityToDTO(item));
         });
 
         return customers;
 
     }
 
-    private CustomerDTO mapCustomerEntityDTO(CustomerEntity customer){
+    // Método para criar um Cliente (Customer)
+    public void createNewCustomer(CustomerDTO customerDTO) {
+        customerRepository.persist(mapCustomerDtoToEntity(customerDTO));
+    }
+
+    // Método para alterar um Cliente (Customer)
+    public void changeCustomer(Long id, CustomerDTO customerDTO) {
+
+        CustomerEntity customer = customerRepository.findById(id);
+
+        customer.setName(customerDTO.getName());
+        customer.setAddress(customerDTO.getAddress());
+        customer.setPhone(customerDTO.getPhone());
+        customer.setEmail(customerDTO.getEmail());
+        customer.setAge(customerDTO.getAge());
+
+        customerRepository.persist(customer);
+
+    }
+
+    public void deleteCustomer(Long id){
+        customerRepository.deleteById(id);
+    }
+
+
+    //Mapeamento de CustomerDTO para CustomerEntity
+    private CustomerDTO mapCustomerEntityToDTO(CustomerEntity customer){
 
         CustomerDTO customerDTO = new CustomerDTO();
 
@@ -38,5 +65,19 @@ public class CustomerService {
         customerDTO.setPhone(customer.getPhone());
 
         return customerDTO;
+    }
+
+    //Mapeamento de CustomerEntity para CustomerDTO
+    private CustomerEntity mapCustomerDtoToEntity(CustomerDTO customer){
+
+        CustomerEntity customerEntity = new CustomerEntity();
+
+        customerEntity.setAddress(customer.getAddress());
+        customerEntity.setAge(customer.getAge());
+        customerEntity.setEmail(customer.getEmail());
+        customerEntity.setName(customer.getName());
+        customerEntity.setPhone(customer.getPhone());
+
+        return customerEntity;
     }
 }
